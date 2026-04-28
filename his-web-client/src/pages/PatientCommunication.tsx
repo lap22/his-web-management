@@ -1,38 +1,26 @@
 import React from 'react'
 import CommunicationWorkspace from '../components/domain/CommunicationWorkspace'
-
-const threads = [
-  { name: 'Minh Nguyen', meta: 'Follow-up after cardiology consult', status: 'Waiting', tone: 'warning' as const },
-  { name: 'Lan Tran', meta: 'Appointment confirmation', status: 'Open' },
-  { name: 'Mai Le', meta: 'Lab result question', status: 'Open' },
-  { name: 'Hoang Pham', meta: 'Urgent discharge note', status: 'Urgent', tone: 'error' as const },
-]
-
-const messages = [
-  {
-    sender: 'Care Coordinator',
-    body: 'Please confirm the follow-up appointment and medication pickup window for tomorrow morning.',
-    time: '09:12',
-  },
-  {
-    sender: 'Minh Nguyen',
-    body: 'Confirmed. I will arrive before 08:30 and bring the latest blood pressure log.',
-    time: '09:18',
-  },
-  {
-    sender: 'Care Coordinator',
-    body: 'Thank you. The cardiology team has been notified and your check-in packet is ready.',
-    time: '09:21',
-  },
-]
+import StateBlock from '../components/ui/StateBlock'
+import useApiResource from '../hooks/useApiResource'
+import { hisService } from '../services/hisService'
 
 export default function PatientCommunication() {
+  const { data, error, isLoading } = useApiResource(() => hisService.getPatientCommunication(), [])
+
+  if (isLoading) {
+    return <StateBlock message="Loading patient communication data..." />
+  }
+
+  if (error || !data) {
+    return <StateBlock title="Patient communication unavailable" message={error ?? 'Communication data is empty.'} tone="error" />
+  }
+
   return (
     <CommunicationWorkspace
       title="Patient Messages"
-      metric="12 pending"
-      threads={threads}
-      messages={messages}
+      metric={data.metric}
+      threads={data.threads}
+      messages={data.messages}
     />
   )
 }

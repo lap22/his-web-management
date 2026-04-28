@@ -673,6 +673,39 @@ button {
   line-height: 1.55;
 }
 
+.state-block {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  padding: 32px;
+  border: 1px solid rgba(191, 199, 212, 0.72);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.state-block strong {
+  color: var(--text);
+  font-family: Manrope, Inter, sans-serif;
+  font-size: 22px;
+}
+
+.state-block p {
+  max-width: 460px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.state-block.error {
+  border-color: rgba(186, 26, 26, 0.24);
+}
+
+.state-block.error strong {
+  color: var(--error);
+}
+
 .icon {
   position: relative;
   display: inline-block;
