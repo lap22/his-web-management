@@ -1,23 +1,37 @@
 import React from 'react'
 import DataTable from '../components/ui/DataTable'
 import Panel, { PanelHeader } from '../components/ui/Panel'
+import StateBlock from '../components/ui/StateBlock'
 import StatusBadge from '../components/ui/StatusBadge'
-
-const doctorRows = [
-  ['DR-204', 'Dr. An Nguyen', 'Cardiology', '08:00-16:00', <StatusBadge>Available</StatusBadge>],
-  ['DR-118', 'Dr. Hoa Tran', 'Emergency', 'On call', <StatusBadge tone="warning">High load</StatusBadge>],
-  ['DR-331', 'Dr. Quang Le', 'Radiology', '10:00-18:00', <StatusBadge>Available</StatusBadge>],
-  ['DR-427', 'Dr. Binh Pham', 'Pediatrics', '12:00-20:00', <StatusBadge tone="error">Escalated</StatusBadge>],
-]
+import useApiResource from '../hooks/useApiResource'
+import { hisService } from '../services/hisService'
 
 export default function DoctorManagement() {
+  const { data: doctors, error, isLoading } = useApiResource(() => hisService.getDoctors(), [])
+
+  if (isLoading) {
+    return <StateBlock message="Loading doctor directory from the HIS API..." />
+  }
+
+  if (error || !doctors) {
+    return <StateBlock title="Doctor directory unavailable" message={error ?? 'Doctor data is empty.'} tone="error" />
+  }
+
+  const doctorRows = doctors.map((doctor) => [
+    doctor.id,
+    doctor.name,
+    doctor.department,
+    doctor.schedule,
+    <StatusBadge tone={doctor.tone}>{doctor.status}</StatusBadge>,
+  ])
+
   return (
     <section className="page-grid">
       <Panel span={12}>
         <PanelHeader
           eyebrow="Clinical staffing"
           title="Doctor Directory"
-          action={<StatusBadge>46 active clinicians</StatusBadge>}
+          action={<StatusBadge>{doctors.length} active clinicians</StatusBadge>}
         />
         <DataTable
           columns={['ID', 'Doctor', 'Department', 'Schedule', 'Status']}
